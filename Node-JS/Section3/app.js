@@ -1,9 +1,13 @@
 const http = require("http");
 
 const server = http.createServer((req, res) => {
-  console.log(req);
+  console.log(req.url, req.method, req.headers);
+  res.setHeader("Content-Type", "text/html");
+  res.write("<html>");
+  res.write("<head><title>Hello World</title></head>");
+  res.write("<body><h1>Show me the money!</h1></body>");
+  res.write("</html>");
+  res.end();
 });
 
 server.listen(3000);
-//  그냥 createServer만으로는 서버를 실행시킬 수 없기 때문에 변수로 선언하고 listen 메서드를 사용
-// listen에 첫번째 인자로 들어가는 값은 포트번호
