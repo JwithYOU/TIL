@@ -88,3 +88,8 @@ const server = http.createServer((req, res) => {
 ```
 
 요청이 들어왔을 때 간단한게 html 양식을 응답하도록 했습니다. 이렇게 하고 크롬에서 개발자도구를 열고 네트워크 탭에 들어갔을 때 작성한대로 Reponse Headers에서 Content-Type: text/html인 것과 작성한 html 내용을 확인할 수 있습니다
+
+## 31.요청과 응답 헤더
+
+아래 링크를 통해서 헤더에 대해서 참고하시면 좋습니다  
+[mdn HTTP headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)
