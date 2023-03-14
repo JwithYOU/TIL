@@ -150,3 +150,34 @@ const server = http.createServer((req, res) => {
 ```
 
 input태그로 텍스트를 입력해서 버튼을 클릭했을 때 POST요청을 보내는 코드를 작성했습니다. input에 아무 내용을 담아서 버튼을 클릭하면 두번째 if문으로 넘어가게 됩니다.
+
+## 34.요청 분문 분석
+
+input에 텍스트를 넣었을 때 어떤 식으로 데이터가 작도잉 되는지 가볍게 보겠습니다.
+
+```js
+if (url === "/message" && method === "POST") {
+  const body = [];
+  req.on("data", (chunk) => {
+    console.log(chunk);
+    body.push(chunk);
+  });
+  req.on("end", () => {
+    const parseBody = Buffer.concat(body).toString();
+    const message = parseBody.split("=")[1];
+    fs.writeFileSync("message.txt", message);
+  });
+  res.statusCode = 302;
+  res.setHeader("Location", "/");
+  return res.end();
+}
+```
+
+위에 작성된대로 코드를 변경하고 input에 hello를 입력하게되면 터미널에 이런 내용이 나타납니다
+
+```js
+<Buffer 6d 65 73 73 61 67 65 3d 68 65 6c 6c 6f>
+```
+
+그리고 작성되어있는대로 과정을 거치면 message.txt가 정상적으로 생성이됩니다.  
+이 과정이 복잡해서 어려워 보일 수 있으나 향후에 사용하게될 Express.js를 쓰게 된다면 조금 더 단순하게 사용할 수 있습니다. 지금은 그저 흐름만 파악하고 넘어가는게 좋습니다.
