@@ -93,3 +93,60 @@ const server = http.createServer((req, res) => {
 
 아래 링크를 통해서 헤더에 대해서 참고하시면 좋습니다  
 [mdn HTTP headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)
+
+## 32.라우터 요청
+
+url에 따라서 다른화면은 보여줄 수 있도록 할 수 있습니다
+
+```js
+const server = http.createServer((req, res) => {
+  const url = req.url;
+  if(url === '/') {
+    res.write("<html>");
+    res.write("<head><title>Enter Message</title></head>");
+    res.write("<body><form action="/message"><input type="text" name="message"></input></form></body>");
+    res.write("</html>");
+    return res.end();
+  }
+  res.setHeader("Content-Type", "text/html");
+  res.write("<html>");
+  res.write("<head><title>Hello World</title></head>");
+  res.write("<body><h1>Show me the money!</h1></body>");
+  res.write("</html>");
+  res.end();
+});
+```
+
+이런식으로 url이 / 일 때와 아닐 때는 각각 다른 내용을 볼 수 있도록 하였습니다. if문 안에 return을 넣은 이유는 res.end() 뒤에는 res.write나 res.setHeader 가 오면 안되기 때문에 함수를 종료하기 위해서 return을 추가해줍니다.
+
+## 33.요청 리디렉션
+
+```js
+const server = http.createServer((req, res) => {
+  const url = req.url;
+  const method = req.method;
+  if (url === "/") {
+    res.write("<html>");
+    res.write("<head><title>Enter Message</title></head>");
+    res.write(
+      "<body><form action='/message' method='POST'><input type='text' name='message'><button type='submit'>Send</button></form></body>"
+    );
+    res.write("</html>");
+    return res.end();
+  }
+  if (url === "/message" && method === "POST") {
+    fs.writeFileSync("message.txt", "DUMMY");
+    res.statusCode = 302;
+    res.setHeader("Location", "/");
+    return res.end();
+  }
+  res.setHeader("Content-Type", "text/html");
+  res.write("<html>");
+  res.write("<head><title>Hello World</title></head>");
+  res.write("<body><h1>Show me the money!</h1></body>");
+  res.write("</html>");
+  res.end();
+});
+```
+
+input태그로 텍스트를 입력해서 버튼을 클릭했을 때 POST요청을 보내는 코드를 작성했습니다. input에 아무 내용을 담아서 버튼을 클릭하면 두번째 if문으로 넘어가게 됩니다.
