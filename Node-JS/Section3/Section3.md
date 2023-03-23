@@ -215,3 +215,31 @@ if (url === "/message" && method === "POST") {
 ```
 
 내부적으로 requsest 분석이 완료되면 req.on의 end 이벤트가 자동으로 실행됩니다. 하지만 이렇게 등록할 경우에는 한 가지 문제점이 발생하게 됩니다. 이 문제점은 바로 이어서 설명하도록 하겠습니다.
+
+## 36. 블로킹 & 논블로킹 코드
+
+fs.writeFileSync를 통해서 입력한 테스트 내용이 message.txt 파일에 담겨서 만들어 지는걸 확인했습니다. 하지만 fs.writeFileSync는 한가지 특징이 있는데 바로 동기적으로 작동 된다는 것입니다.  
+동기적으로 작동이 된다면 어떠한 작업이 끝나지 않으면 다음 작업으로 넘어갈 수 없습니다.
+
+```js
+fs.writeFileSync("message.txt", message);
+res.statusCode = 302;
+res.setHeader("Location", "/");
+return res.end();
+```
+
+작성된 코드에서 텍스트를 몇 가지 입력하는 정도는 작업시간이 많이 소요되지 않습니다.  
+하지만 만약 처리시간이 오래 걸리는 작업이라면 굉장히 비효율적이게 됩니다.
+그래서 비동기 처리방식인 fs.writeFile이 있습니다.  
+여기서는 파일이 정상적인 과정이 지나고 나서 다음 코드를 진행하고 싶다면  
+writeFile 세번째 인자에다가 함수를 넣어주면 됩니다.
+
+```js
+fs.writeFile("message.txt", message, (err) => {
+  res.statusCode = 302;
+  res.setHeader("Location", "/");
+  return res.end();
+});
+```
+
+이렇게 작성하면 txt파일 작성이되고 나서 응답코드를 실행할 수 있습니다.
