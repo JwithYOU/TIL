@@ -271,3 +271,60 @@ Node.js 코드가 실행이되면 이벤트루프가 작동됩니다. 이벤트�
    시스템 리소스를 해제하는 콜백 함수가 실행됩니다.
 
 이벤트루프는 이러한 단걔를 반복하면서 새로운 이벤트가 발생할 때마다 이벤트를 처리합니다. 이러한 방식으로 Node.js는 비동기적인 방식으로 다양한 작업을 처리할 수 있으며 이를 통해 높은 성능을 발휘할 수 있습니다.
+
+## 38. Node 모듈 시스템 사용
+
+url 확인 등의 작업을 하는 라우팅 파일을 만들어서 보겠습니다.
+
+```js
+// routes.js
+const fs = require("fs");
+
+const requestHandler = (req, res) => {
+  const url = req.url;
+  const method = req.method;
+  if (url === "/") {
+    res.write("<html>");
+    res.write("<head><title>Enter Message</title></head>");
+    res.write(
+      "<body><form action='/message' method='POST'><input type='text' name='message'><button type='submit'>Send</button></form></body>"
+    );
+    res.write("</html>");
+    return res.end();
+  }
+  if (url === "/message" && method === "POST") {
+    const body = [];
+    req.on("data", (chunk) => {
+      body.push(chunk);
+    });
+    return req.on("end", () => {
+      const parseBody = Buffer.concat(body).toString();
+      const message = parseBody.split("=")[1];
+      fs.writeFile("message.txt", message, (err) => {
+        res.statusCode = 302;
+        res.setHeader("Location", "/");
+        return res.end();
+      });
+    });
+  }
+  res.setHeader("Content-Type", "text/html");
+  res.write("<html>");
+  res.write("<head><title>Hello World</title></head>");
+  res.write("<body><h1>Show me the money!</h1></body>");
+  res.write("</html>");
+  res.end();
+};
+
+module.exports = requestHandler;
+
+// app.js
+const http = require("http");
+
+const routes = require("./routes");
+
+const server = http.createServer(routes);
+
+server.listen(3000);
+```
+
+기존에 app.js에 있던 코드를 routes.js라는 파일을 만들어서 옮겼습니다. 이 과정에서 app.js가 routes.js에 있는 함수를 사용하기 위해서 module.exports를 사용하였고 app.js에서는 require를 사용해서 해당 함수를 불러왔습니다.
