@@ -6,11 +6,7 @@ const app = express();
 
 app.use((req, res, next) => {
   console.log("In the middleware");
-  next();
-});
-
-app.use((req, res, next) => {
-  console.log("In another middleware");
+  res.send("Hello");
 });
 
 const server = http.createServer(app);
