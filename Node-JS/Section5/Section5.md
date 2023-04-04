@@ -50,3 +50,43 @@ server.listen(3000);
 
 send를 활용해서 브라우저에 내용을 띄울 수 있습니다. 그럼 여기서 write()와 send()의 차이는 뭘까요?
 바로 res.end()가 필요있고 없고의 차이입니다. write의 경우에느 res.end()를 호출 하기 전에는 클라이언트에게 응답이 전송되지 않습니다. 그러나 send는 그럴 필요없이 다양한 타입의 응답을 보낼 수 있습니다. 따라서 write()는 응답 본문을 작성하는 메서드이고 send()는 응답 본문을 클라이언트에게 보내는 메서드입니다. send()는 내부적으로 write()와 end()를 호출합니다. 그리고 send()는 응답 코드와 응답 헤더도 자동으로 설정합니다.
+
+## 62. Express.js 백그라운드 확인
+
+Express.js 깃허브 저장소에 가서 lib -> response.js에 들어가면 이미 사용했던 send함수를 찾아볼 수 있습니다.
+
+```js
+switch (typeof chunk) {
+  // string defaulting to html
+  case "string":
+    if (!this.get("Content-Type")) {
+      this.type("html");
+    }
+    break;
+  case "boolean":
+  case "number":
+  case "object":
+    if (chunk === null) {
+      chunk = "";
+    } else if (Buffer.isBuffer(chunk)) {
+      if (!this.get("Content-Type")) {
+        this.type("bin");
+      }
+    } else {
+      return this.json(chunk);
+    }
+    break;
+}
+```
+
+그 중에서 일부 코드를 가져왔는데 확인해보면 string 타입 일 떄 콘텐츠 유형을 html로 설정합니다. 그리고 타입이 boolean, number, object일 경우 바이너리 또는 json 데이터로 설정됩니다. 이 코드는 일부만 가져온 것일 뿐이지 전체를 들여 다 볼 필요는 없습니다.
+
+Express.js를 사용하면 코드를 더 간결하게 만들 수 있습니다.
+
+```js
+const server = http.createServer(app);
+
+server.listen(3000);
+```
+
+app을 createrServer로 보내도 되지만 app을 listen으로 바로 작성해도 됩니다. 이 또한 Express.js 깃허브 application.js 들어가보면 http.createServer를 호출하고 있는 것을 확인할 수 있습니다. 그렇기 때문에 require("http") 할 필요가 없이도 nodemon을 실행시키면 정상적으로 작동하는 것을 확인할 수 있습니다.
