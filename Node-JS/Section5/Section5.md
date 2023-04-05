@@ -90,3 +90,27 @@ server.listen(3000);
 ```
 
 app을 createrServer로 보내도 되지만 app을 listen으로 바로 작성해도 됩니다. 이 또한 Express.js 깃허브 application.js 들어가보면 http.createServer를 호출하고 있는 것을 확인할 수 있습니다. 그렇기 때문에 require("http") 할 필요가 없이도 nodemon을 실행시키면 정상적으로 작동하는 것을 확인할 수 있습니다.
+
+## 63. 다른 라우트 사용법
+
+app.use()에 경로를 지정하면 화면에 다른 내용을 출력할 수 있습니다.
+
+```js
+const express = require("express");
+
+const app = express();
+
+app.use("/add-product", (req, res) => {
+  console.log("In another middleware");
+  res.send("add-product");
+});
+
+app.use("/", (req, res) => {
+  console.log("In the middleware");
+  res.send("Hello");
+});
+
+app.listen(3000);
+```
+
+새로운 use를 생성하고 "/add-product"로 접속했을 때 다른 내용을 출력하도록 수정했습니다. "/add-product"를 먼저 작성한 이유는 파일을 위에서 아래로 읽기 땨문에 "/" 경로가 먼저 있다면 localhost:3000/add-product는 "/" 경로로 빠질 수 밖에 없습니다.
