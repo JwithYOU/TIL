@@ -114,3 +114,52 @@ app.listen(3000);
 ```
 
 새로운 use를 생성하고 "/add-product"로 접속했을 때 다른 내용을 출력하도록 수정했습니다. "/add-product"를 먼저 작성한 이유는 파일을 위에서 아래로 읽기 땨문에 "/" 경로가 먼저 있다면 localhost:3000/add-product는 "/" 경로로 빠질 수 밖에 없습니다.
+
+## 64. 수신 요청 분석
+
+POST 요청이 들어왔을 때 다루도록 해보겠습니다.
+
+```js
+app.use("/add-product", (req, res, next) => {
+  res.send(
+    '<form action="/product" method="POST"><input type="text" name="title"><button type="submit">Add product</button></form>'
+  );
+});
+
+app.use("/product", (req, res) => {
+  console.log(req.body);
+  res.redirect("/");
+});
+
+app.use("/", (req, res, next) => {
+  res.send("<h1>Hello!</h1>");
+});
+```
+
+'/add-product' 경로로 들어왔을 떄 form 형식을 반환하도록 했습니다. 여기서 버튼 클릭시에 /proudct로 이동하도록 했고 '/product'에서 redirect로 '/'경로 이동하도록 했습니다. 하지만 input에 텍스트를 넣고 버튼을 클릭하면 console.log(req.body)는 undefined로 나타납니다. 그 이유는 req는 기본적으로 들어오는 요청의 본문을 분석하지 않기 때문입니다. 그래서 해당 내용을 분석할 수 있도록 body-parser를 설치하고 임포트 합니다.
+
+```js
+const express = require("express");
+const bodyParser = require("body-parser");
+
+const app = express();
+
+app.use(bodyParser.urlencoded({ extended: false }));
+
+app.use("/add-product", (req, res, next) => {
+  res.send(
+    '<form action="/product" method="POST"><input type="text" name="title"><button type="submit">Add product</button></form>'
+  );
+});
+
+app.use("/product", (req, res) => {
+  console.log(req.body);
+  res.redirect("/");
+});
+
+app.use("/", (req, res, next) => {
+  res.send("<h1>Hello!</h1>");
+});
+
+app.listen(3000);
+```
