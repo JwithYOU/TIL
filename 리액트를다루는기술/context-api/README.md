@@ -8,6 +8,8 @@ App 컴포넌트에게 A와 H라는 자식 컴포넌트가 있습니다. 이 두
 
 ## 15.2 Context API 사용법 익히기
 
+### Consumer 사용하기
+
 ```js
 // color.js
 import { CreateContext } from "react";
@@ -44,3 +46,28 @@ export default ColorBox;
 ```
 
 ColorBox.js 파일 생성한 다음에 색상을 props로 받아오는 것이 아니라 Consumer라는 컴포넌트를 통해 색상을 조회 합니다. Consumer 사이에 중괄호를 열어서 그 안에 함수를 넣었습니다. 이러한 패턴을 Function as achild, Render Props 라고 합니다. 컴포넌트의 children이 있어야할 자리에 일반 JSX 혹은 문자열이 아닌 함수를 전달한 것입니다.
+
+### Provider
+
+Provider를 사용하면 Context의 value를 변경할 수 있습니다.
+
+```js
+// App.js
+import React from "react";
+import ColorContext from "./color";
+import ColoerBox from "./ColorBox";
+
+const App = () => {
+  return (
+    <ColorContext.Provider value={{ color: "red" }}>
+      <div>
+        <ColorBox />
+      </div>
+    </ColorContext.Provider>
+  );
+};
+
+export default App;
+```
+
+기존에
