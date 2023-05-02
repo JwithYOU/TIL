@@ -21,7 +21,8 @@
 
 깃허브를 사용하면서 작성한 코드를 원격에 push 하려면 commit message를 작성해야 합니다. 여기서 개발자가 다른 개발자의 코드를 분석할 때 이 코드가 어떤 목적을 가지고 작성되었는지를 commit message를 통해서 확인할 수 있도록 명시해야 합니다.  
 그렇기에 팀 내에서 일관된 commit message 규칙을 정하는 것은 필수사항 입니다. 정석은 없지만 메세지에 어떤 내용들이 포함되고 어떤 규칙을 사용하지는 팀원들과 정해야합니다. 아래 링크를 통해서 도움을 얻을 수 있습니다.  
-[Commit message guidelines](https://gist.github.com/robertpainsi/b632364184e70900af4ab688decf6f53)[How to Write Good Commit Message](https://www.freecodecamp.org/news/writing-good-commit-messages-a-practical-guide/)
+[Commit message guidelines](https://gist.github.com/robertpainsi/b632364184e70900af4ab688decf6f53)  
+[How to Write Good Commit Message](https://www.freecodecamp.org/news/writing-good-commit-messages-a-practical-guide/)
 
 ### ESLint와 Prettier, Git Hook을 이용한 팀의 능률 올리기
 
