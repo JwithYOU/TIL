@@ -79,13 +79,13 @@ module.exports = {
 };
 ```
 
-> prettier를 적용하면 에디터 내에서 자동으로 적옹이 되지만 터미널 명령어를 통해서도 할 수 있습니다.  
-> ` npx prettier .` 여기서 . 은 현재 폴더 있는 모든 파일에게 적용한다는 뜻입니다. 명령어를 입력하고 터미널을 보면 포맷된 형태의 내용이 나타나는 것을 볼 수 있습니다.  
-> 터미널 출력에서 벗어나 변경된 내용을 저장까지 하는 방법도 있습니다. `npx prettier --write .` --write 까지 추가하면 저장까지 되는 것을 확인할 수 있습니다.  
-> 한 개의 파일만 수정했을 때 해당 파일만 포맷하는 방법eh 있습니다. `npx prettier --write -cache .`  
-> 이렇게 하면 불필요한 포맷작업을 하지 않아도 됩니다.  
-> 이런화 과정을 통해서 자동화를 사용할 수 있습니다.  
-> package.json에서 scripts에 원하는 명령어와 `npx prettier --write -cache .` 를 추가하면 npm을 통해서 해당 명령어를 실행할 수 있습니다.
+prettier를 적용하면 에디터 내에서 자동으로 적옹이 되지만 터미널 명령어를 통해서도 할 수 있습니다.  
+` npx prettier .` 여기서 . 은 현재 폴더 있는 모든 파일에게 적용한다는 뜻입니다. 명령어를 입력하고 터미널을 보면 포맷된 형태의 내용이 나타나는 것을 볼 수 있습니다.  
+터미널 출력에서 벗어나 변경된 내용을 저장까지 하는 방법도 있습니다. `npx prettier --write .` --write 까지 추가하면 저장까지 되는 것을 확인할 수 있습니다.  
+한 개의 파일만 수정했을 때 해당 파일만 포맷하는 방법이 있습니다. `npx prettier --write -cache .`  
+이렇게 하면 불필요한 포맷작업을 하지 않아도 됩니다.  
+이런화 과정을 통해서 자동화를 사용할 수 있습니다.  
+package.json에서 scripts에 원하는 명령어와 `npx prettier --write -cache .` 를 추가하면 npm을 통해서 해당 명령어를 실행할 수 있습니다.
 
 5-2) ESLint 설정
 
@@ -93,7 +93,7 @@ module.exports = {
 - eslint에서 기본적으로 javascript를 위한 lint 기능이기 때문에 제공되지 않는 특정 환경의 rule을 추가하고 싶을 때는 plugin을 이용할 수 있습니다.
 - 예시
 
-```js
+```json
 // .eslintrc
 
 {
@@ -109,4 +109,88 @@ module.exports = {
 }
 ```
 
-## Week1-2
+eslint에서도 prettier에서와 유사하게 사용할 수 있습니다.  
+`npx eslint .`을 하면 전체파일을 검사하고 `npx eslint --cache .`를 입력하면 변경된 사항에서만 검사를 진행합니다.  
+검사해야하는 파일과 아닌 파일을 구분하는 방법은 `.eslintcache` 파일에 저장이 됩니다.  
+이 파일은 작성자 pc 폴더를 기준으로 저장이되니 다른 pc에서는 불필요한 사항이므로 gitignore에 추가해서 깃허브에 올라가지 않도록 해야합니다.
+
+### 6. Husky
+
+#### 6-1. 도입배경
+
+- eslint와 prettier만 도입해도 개인이 작업할 때 적용 안 하면 말짱 도루묵...
+  그것을 방지하기 위해서 도입
+- husky의 장점
+  1. 매우 낮은 용량(6kB)
+  2. zero dependencies (의존성이 없기 때문에 다른 곳에 문제가 생겨도 돌아가는데 지장 없음)
+
+#### 6-2. 문제해결방안
+
+- 자동화를 통해서 특정 상황에 적요
+- commit된 코드는 formatting이 되고 eslint를 통과 해야 push될 수 있도록 구축
+
+#### 6-3. 실행방안
+
+- git hook 도입
+- git hook은 git에서 특정 상황 전, 후에 hook이 실행됨
+- husky를 사용해서 git hook을 보다 편리하게 설정할 수 있음
+
+#### 6-4. Husky
+
+- git hook을 도와주는 npm package
+
+#### 6-5. Husky를 통한 Git Hook 적용
+
+1. `npm  install husky --save-dev`
+2. (처음 husky 세팅하는 사람만 필요) `npx husky install`  
+   a. `npx husky install` : husky에 등록된 hook을 실제 .git에 적용시키기 위한 스크립트  
+   b. add postinstall script in package.json  
+   (clone 받은 후 npm install 후 자동으로 husky install 되도록하는 설정)
+
+```json
+// package.json
+
+{
+  "scripts": {
+    "postinstall": "husky install"
+  }
+}
+```
+
+3. scripts 설정
+
+```json
+// package.json
+
+{
+  "scripts": {
+    "postinstall": "husky install",
+    "format": "prettier --cache --write .",
+    "lint": "eslint --cache ."
+  }
+}
+```
+
+4. add pre-commit, pre-push hook  
+   a. `npx husky add .husky/pre-commit "npm run format"`  
+   b. `npx husky add .husky/pre-push "npm run lint""`
+
+#### 6-6. 참고사항
+
+- git hook에서 eslint 에러가 발견하면 실행중인 script가 종료 되기에 이 rule에 대해서 error나 warn 중에서 뭐로 할지 정해야함
+  - 예시)
+    - `"no-console": ["warn", { "allow": ["warn", "error", "info"] }]`
+      console.log가 있어도 push 가능
+    - `"no-console": ["error", { "allow": ["warn", "error", "info"] }]`
+      error로 설정 되어있어 push 안 됨
+  * 참고사항)
+  - lint에서 warn도 허용하지 않으려면 `eslint --max-warning=0`을 옵션으로 scripts에 추가하면 됨
+
+```json
+// package.json
+{
+  "scripts": {
+    "lint": "eslint --cache --max-warnings=0"
+  }
+}
+```
