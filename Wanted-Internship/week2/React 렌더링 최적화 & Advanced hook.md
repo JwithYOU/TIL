@@ -172,6 +172,46 @@ props는 객체 형태로 표현됩니다. 그리고 props 객체는 매 렌더�
 
 그렇다면 비교해야 하는 것은 props 객체 안의 각 프로퍼티들입니다. 리액트는 props 객체 안의 각 프로퍼티들을 `Object.is(===)` 연산자를 사용해서 비교합니다. 이 중 하나라도 false가 나온다면 props가 변경되었다 판단하고 리렌더링을 수행합니다.
 
+간단하게 React.memo를 잘못 사용한 예시를 가지고 설명해 보겠습니다.
+
+```js
+export default function App() {
+  const [text, setText] = useState("");
+  const [_, setState] = useState(1);
+
+  const reRender = () => setState((prev) => prev + 1);
+  return (
+    <>
+      <input value={text} onChange={(e) => setText(e.target.value)} />
+      <button onClick={reRender}>re render</button>
+      <MemoizedComponent name="memo O" value={text} reRender={reRender} />
+    </>
+  );
+}
+
+function ChildComponent({ name, value }) {
+  console.log(`${name} rendered`);
+
+  return (
+    <h3>
+      {name}: {value}
+    </h3>
+  );
+}
+
+const MemoizedComponent = React.memo(ChildComponent);
+```
+
+위 코드에서 text가 변경이되면 MemoizationComponent에 props가 변경이 되므로 리렌더링이됩니다. 하지만 reRender 함수가 호출이 되는 버튼을 클릭하면 text 변경이 없어도 리렌더링이됩니다. 그 이유는 reRender 함수가 state를 변경하기 때문에 상위 컴포넌트인 App 컴포넌트가 리렌더링이 됩니다. 앞서 언급했듯이 함수는 참조형 타입입니다. 이전 reRender 함수의 메모리 주소와 새로운 reRender 함수의 메모리 주소가 달라서 React.memo는 props에 담겨지는 reRender 함수가 같지않다 판단하고 리렌더링을 하게 됩니다.
+
 ---
 
-## 3. Memoization
+> ## 3. Memoization
+>
+> Memoization은 특정한 값을 저장해뒀다가, 이후에 해당 값이 필요할 때 새롭게 계산해서 사용하는게 아니라 저장해둔 값을 활용하는 테크닉을 의미합니다.
+
+함수 컴포넌트는 근본적으로 함수입니다. 리액트에서는 매 렌더링마다 함수 컴포넌트를 다시 호출하는데 함수는 기본적으로 이전 호출과 새로운 호출간에 값을 공유할 수 없습니다. 만약 특정한 함수 호출 내에서 만들어진 변수를 다음 함수 호출때도 사용하고 싶으면 그 값을 외부의 특정한 공간에 저장하고 다음 호출 때 다시 꺼내와야 합니다.
+
+직접 구현하는 작업이 꽤나 번거롭기 때문에 리액트에서는 보다 쉽게 함수 컴포넌트 값을 memoization 할 수 있게 hook을 제공하고 있습니다.
+
+### 1. useMemo
