@@ -73,7 +73,7 @@ Presentional은 반대로 로직은 상관하지 않고 UI가 어떻게 구성�
 
 이 패턴은 그 효용을 인정받아 Hook이 등장하기 전에는 관심사를 분리하는 패턴으로 사용되었습니다.
 
-하지만 Hook이 등장하면서 Custom Hook이란 기법이 밞명 되었고, 더 효율적으로 관심사를 분리할 수 있다고 판단이 되면서 Presentional - Container 패턴은 만힝 사용하지 않게 되었습니다.
+하지만 Hook이 등장하면서 Custom Hook이란 기법이 발명 되었고, 더 효율적으로 관심사를 분리할 수 있다고 판단이 되면서 Presentional - Container 패턴은 만힝 사용하지 않게 되었습니다.
 
 > ### React에서 관심사를 분리하는 법: Custom Hook
 
